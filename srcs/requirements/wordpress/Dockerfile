@@ -13,9 +13,7 @@ RUN	apt update && apt upgrade -y && \
 	php7.4-mbstring php7.4-xml php7.4-gd \
 	wget mariadb-client
 
-#Faz o Download do wp-cli
-#concede permissao de execucao
-#move o wp-cli para o /urs/local/bin/wp
+#Faz o Download do wp-cli e a sua instalacao
 RUN	wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
 	--output-document=/usr/local/bin/wp && \
 	chmod +x /usr/local/bin/wp
@@ -24,25 +22,21 @@ RUN	wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.ph
 RUN	mkdir -p /run/php /var/www/html && \
 	chmod -R 755 /var/www/html
 
+#Copia o arquivo de configuração do php-fpm e define as permissoes
+COPY	./conf/www.conf /etc/php/7.4/fpm/pool.d/www.conf
+RUN	chmod 755 /etc/php/7.4/fpm/pool.d/www.conf
+
 #define o diretorio de trabalho
-WORKDIR /var/www/html
+WORKDIR	/var/www/html
 
-#RUN	wget http://wordpress.org/latest.tar.gz && \
-#	tar xfz latest.tar.gz && \
-#	mv wordpress/* . && \
-#	rm -rf latest.tar.gz wordpress
-
-#Copia o arquivo de configuração do php-fpm
-COPY ./conf/www.conf /etc/php/7.4/fpm/pool.d/www.conf
 #Copia o script de instalação do wordpress
-COPY ./tools/entrypoint.sh /usr/local/bin
+COPY	./tools/entrypoint.sh /usr/local/bin
 
-#Concede permissoes para o arquivo de configuracao e para o script
-RUN	chmod 755 /etc/php/7.4/fpm/pool.d/www.conf && \
-	chmod +x /usr/local/bin/entrypoint.sh
+#Concede permissoes para e para o script
+RUN	chmod +x /usr/local/bin/entrypoint.sh
 
 #Abre a porta 9000 do conteiner
-EXPOSE 9000
+EXPOSE	9000
 
 #Executa o script de instalacao do wordpress
 ENTRYPOINT ["entrypoint.sh"]

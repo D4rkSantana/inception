@@ -2,17 +2,14 @@
 # Define a imagem base
 FROM	debian:bullseye
 
-#Atualiza os repositorios e pacotes
-#instala o mariadb
+#Atualiza os repositorios e pacotes e instala o mariadb
 RUN	apt update -y && apt upgrade -y && \
 	apt install mariadb-server -y
 
-#Cria os diretorios para o mysql
-#modifica o proprietario e o grupo das pastas
-#modifica as permissoes
+#Cria os diretorios para o mysql e concede as permisoes
 RUN 	mkdir -p /var/lib/mysql /var/run/mysqld && \
 	chown -R mysql:mysql /var/lib/mysql /var/run/mysqld && \
-	chmod 755 /var/run/mysqld
+	chmod 777 -R /var/run/mysqld /var/lib/mysql
 
 #copia o arquivo de configuracao para o mariadb
 COPY	./conf/my.cnf /etc/mysql/mariadb.conf.d/
